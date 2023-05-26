@@ -32,9 +32,9 @@ def readfile(filename):
                 title, authors, publisher, published_date, isbn = book
                 author_str = ', '.join(authors)
                 if isbn:
-                    outfile.write(f'{title};{author_str};{publisher};{published_date};{isbn}\n')
+                    outfile.write(f'{title};{author_str};{publisher};{published_date};{isbn};\n')
                 else:
-                    outfile.write(f'{title};{author_str};{publisher};{published_date}\n')
+                    outfile.write(f'{title};{author_str};{publisher};{published_date};;\n')
 
 def author(author_name):
     with open('List.txt', 'w', encoding='utf-8') as outfile:
@@ -44,9 +44,9 @@ def author(author_name):
             title, authors, publisher, published_date, isbn = book
             author_str = ', '.join(authors)
             if isbn:
-                outfile.write(f'{title};{author_str};{publisher};{published_date};{isbn}\n')
+                outfile.write(f'{title};{author_str};{publisher};{published_date};{isbn};\n')
             else:
-                outfile.write(f'{title};{author_str};{publisher};{published_date}\n')
+                outfile.write(f'{title};{author_str};{publisher};{published_date};;\n')
 
 def main():
     while True:
