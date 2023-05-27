@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-
+import os
 
 def convert_to_excel(filename='List.txt'):
   
@@ -20,6 +20,8 @@ def convert_to_excel(filename='List.txt'):
 
     df = pd.DataFrame(books)
     df.to_excel('List.xlsx', index=False)
+    #delete the txt file
+    os.remove(filename)
 
 
 def get_books_by_author(author_name):
@@ -45,7 +47,12 @@ def get_books_by_author(author_name):
                     elif identifier['type'] == 'ISBN_10':
                         isbn = identifier['identifier']
                         break
-            books.append((book_title, authors, publisher, published_date, isbn))
+            #check if one of the authors is the author we are looking for, in terms of matching string (not case sensitive)
+            for a in authors:
+                #check if author_name is contained in string a by string matching
+                if author_name.lower() in a.lower():
+                    books.append((book_title, authors, publisher, published_date, isbn))
+                    break
         start_index += 40
     return books
 
