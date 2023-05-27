@@ -1,4 +1,26 @@
 import requests
+import pandas as pd
+
+
+def convert_to_excel(filename='List.txt'):
+  
+    books = []
+    i=0
+    with open(filename, 'r', encoding='utf-8') as file:
+        for line in file:
+            fields = line.strip().split(';')
+            book = {
+                'Title': fields[0],
+                'Author': fields[1],
+                'Publisher': fields[2],
+                'Date of Publication': fields[3],
+                'ISBN number': fields[4]
+            }
+            books.append(book)
+
+    df = pd.DataFrame(books)
+    df.to_excel('List.xlsx', index=False)
+
 
 def get_books_by_author(author_name):
     books = []
@@ -34,26 +56,26 @@ def readfile(filename):
         for line in file:
             author_name = line.strip()
             books = get_books_by_author(author_name)
-            outfile.write(f'\nBooks by {author_name}:\n')
+            # outfile.write(f'\nBooks by {author_name}:\n')
             for book in books:
                 title, authors, publisher, published_date, isbn = book
                 author_str = ', '.join(authors)
                 if isbn:
-                    outfile.write(f'{title};{author_str};{publisher};{published_date};{isbn};\n')
+                    outfile.write(f'{title} ;{author_str} ;{publisher} ;{published_date} ;{isbn};\n')
                 else:
-                    outfile.write(f'{title};{author_str};{publisher};{published_date};;\n')
+                    outfile.write(f'{title} ;{author_str} ;{publisher} ;{published_date} ; ;\n')
 
 def author(author_name):
     with open('List.txt', 'w', encoding='utf-8') as outfile:
         books = get_books_by_author(author_name)
-        outfile.write(f'\nBooks by {author_name}:\n')
+        # outfile.write(f'\nBooks by {author_name}:\n')
         for book in books:
             title, authors, publisher, published_date, isbn = book
             author_str = ', '.join(authors)
             if isbn:
-                outfile.write(f'{title};{author_str};{publisher};{published_date};{isbn};\n')
+                outfile.write(f'{title} ;{author_str} ;{publisher} ;{published_date} ;{isbn};\n')
             else:
-                outfile.write(f'{title};{author_str};{publisher};{published_date};;\n')
+                outfile.write(f'{title} ;{author_str} ;{publisher} ;{published_date}; ;\n')
 
 def main():
     while True:
@@ -61,11 +83,13 @@ def main():
         if choice == '1':
             filename = input("Enter filename containing list of Authors: ")
             readfile(filename)
-            print("Done! \nCheck List.txt\n")
+            convert_to_excel()
+            print("Done! \nCheck List.xlsx\n")
         elif choice == '2':
             author_name = input("Enter Author Name: ")
             author(author_name)
-            print("Done! \nCheckout List.txt\n")
+            convert_to_excel()
+            print("Done! \nCheckout List.xlsx\n")
         elif choice == '3':
             print("Exiting...\n")
             break
