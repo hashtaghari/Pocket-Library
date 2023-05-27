@@ -4,4 +4,4 @@ This is a simple script that can be used to get the list of all the books writte
 
 To tun the script, simply execute the python file. If you have a list of authors in a txt file, enter the path of the file as input. 
 
-##### Made as an attempt to help IIIT Library Purchase some literature related books of Nobel Prize Laureates. 
+##### Made as an attempt to help IIIT Library Purchase some literature related books of Nobel Prize Laureates. (names.txt contains the list from 1901 to 2021)
