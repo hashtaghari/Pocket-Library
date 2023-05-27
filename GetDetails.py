@@ -1,26 +1,33 @@
 import requests
 
 def get_books_by_author(author_name):
-    url = f'https://www.googleapis.com/books/v1/volumes?q=inauthor:{author_name}'
-    response = requests.get(url)
-    data = response.json()
     books = []
-    for item in data['items']:
-        book_title = item['volumeInfo']['title']
-        authors = item['volumeInfo'].get('authors', [])
-        publisher = item['volumeInfo'].get('publisher', '')
-        published_date = item['volumeInfo'].get('publishedDate', '')
-        isbn = ''
-        if 'industryIdentifiers' in item['volumeInfo']:
-            for identifier in item['volumeInfo']['industryIdentifiers']:
-                if identifier['type'] == 'ISBN_13':
-                    isbn = identifier['identifier']
-                    break
-                elif identifier['type'] == 'ISBN_10':
-                    isbn = identifier['identifier']
-                    break
-        books.append((book_title, authors, publisher, published_date, isbn))
+    start_index = 0
+    while True:
+        url = f'https://www.googleapis.com/books/v1/volumes?q=inauthor:{author_name}&maxResults=40&startIndex={start_index}'
+        response = requests.get(url)
+        data = response.json()
+        if 'items' not in data:
+            break
+        for item in data['items']:
+            book_title = item['volumeInfo']['title']
+            authors = item['volumeInfo'].get('authors', [])
+            publisher = item['volumeInfo'].get('publisher', '')
+            published_date = item['volumeInfo'].get('publishedDate', '')
+            isbn = ''
+            if 'industryIdentifiers' in item['volumeInfo']:
+                for identifier in item['volumeInfo']['industryIdentifiers']:
+                    if identifier['type'] == 'ISBN_13':
+                        isbn = identifier['identifier']
+                        break
+                    elif identifier['type'] == 'ISBN_10':
+                        isbn = identifier['identifier']
+                        break
+            books.append((book_title, authors, publisher, published_date, isbn))
+        start_index += 40
     return books
+
+
 
 def readfile(filename):
     with open(filename, 'r', encoding='utf-8') as file, open('List.txt', 'w', encoding='utf-8') as outfile:
@@ -50,7 +57,7 @@ def author(author_name):
 
 def main():
     while True:
-        choice = input("(1) Read from File\n(2) Enter Author Name \n(3) Exit(1/2) \nYour Choice: ")
+        choice = input("(1) Read from File\n(2) Enter Author Name \n(3) Exit \nYour Choice: ")
         if choice == '1':
             filename = input("Enter filename containing list of Authors: ")
             readfile(filename)
