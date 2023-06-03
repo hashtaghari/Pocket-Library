@@ -41,6 +41,7 @@ def get_books_by_author(author_name):
             pd = item['volumeInfo'].get('publishedDate', '')
             published_date = pd[:4] if len(pd) > 4 else pd
             isbn = ''
+            lang = item['volumeInfo'].get('language', '')
             if 'industryIdentifiers' in item['volumeInfo']:
                 for identifier in item['volumeInfo']['industryIdentifiers']:
                     if identifier['type'] == 'ISBN_13':
@@ -53,6 +54,7 @@ def get_books_by_author(author_name):
             for a in authors:
                 #check if author_name is contained in string a by string matching
                 if author_name.lower() in a.lower():
+                    # if book_title!='INVALID' and lang=='en':
                     if book_title!='INVALID':
                         books.append((book_title, authors, publisher, published_date, isbn))
                         break
@@ -100,26 +102,24 @@ def remove_dupes(filename = 'List.xlsx'):
 
 def main():
     while True:
-        choice = input("(1) Read from File\n(2) Enter Author Name \n(3) Remove Duplicates from List.xlsx \n(4) Exit \nYour Choice: ")
+        choice = input("(1) Read from File\n(2) Enter Author Name \n(3) Exit \nYour Choice: ")
         if choice == '1':
             filename = input("Enter filename containing list of Authors: ")
             readfile(filename)
             convert_to_excel()
+            abc = 'List.xlsx'
+            remove_dupes(abc)
             print("Done! \nCheck List.xlsx\n")
         elif choice == '2':
             author_name = input("Enter Author Name: ")
             author(author_name)
             convert_to_excel()
+            abc = 'List.xlsx'
+            remove_dupes(abc)
             print("Done! \nCheckout List.xlsx\n")
-        elif choice == '4':
+        elif choice == '3':
             print("Exiting...\n")
             break
-        elif choice == '3':
-            # filename = input("Enter filename containing duplicates:")
-            filename = 'List.xlsx'
-            # convert_to_excel()
-            remove_dupes(filename)
-            print("Done! \nRemoved duplicate titles from List.xlsx\n")
         else:
             print("Invalid Choice.\n")
 
