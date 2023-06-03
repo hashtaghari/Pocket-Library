@@ -8,7 +8,7 @@ def convert_to_excel(filename='List.txt'):
     i=0
     with open(filename, 'r', encoding='utf-8') as file:
         for line in file:
-            fields = line.strip().split(';')
+            fields = line.strip().split('|')
             book = {
                 'Title': fields[0],
                 'Author': fields[1],
@@ -34,10 +34,12 @@ def get_books_by_author(author_name):
         if 'items' not in data:
             break
         for item in data['items']:
-            book_title = item['volumeInfo']['title']
+            # book_title = item['volumeInfo']['title']
+            book_title = item['volumeInfo'].get('title','INVALID')
             authors = item['volumeInfo'].get('authors', [])
             publisher = item['volumeInfo'].get('publisher', '')
-            published_date = item['volumeInfo'].get('publishedDate', '')
+            pd = item['volumeInfo'].get('publishedDate', '')
+            published_date = pd[:4] if len(pd) > 4 else pd
             isbn = ''
             if 'industryIdentifiers' in item['volumeInfo']:
                 for identifier in item['volumeInfo']['industryIdentifiers']:
@@ -51,8 +53,9 @@ def get_books_by_author(author_name):
             for a in authors:
                 #check if author_name is contained in string a by string matching
                 if author_name.lower() in a.lower():
-                    books.append((book_title, authors, publisher, published_date, isbn))
-                    break
+                    if book_title!='INVALID':
+                        books.append((book_title, authors, publisher, published_date, isbn))
+                        break
         start_index += 40
     return books
 
@@ -68,9 +71,9 @@ def readfile(filename):
                 title, authors, publisher, published_date, isbn = book
                 author_str = ', '.join(authors)
                 if isbn:
-                    outfile.write(f'{title} ;{author_str} ;{publisher} ;{published_date} ;{isbn};\n')
+                    outfile.write(f'{title} |{author_str} |{publisher} |{published_date} |{isbn}|\n')
                 else:
-                    outfile.write(f'{title} ;{author_str} ;{publisher} ;{published_date} ; ;\n')
+                    outfile.write(f'{title} |{author_str} |{publisher} |{published_date} | |\n')
 
 def author(author_name):
     with open('List.txt', 'w', encoding='utf-8') as outfile:
@@ -80,13 +83,24 @@ def author(author_name):
             title, authors, publisher, published_date, isbn = book
             author_str = ', '.join(authors)
             if isbn:
-                outfile.write(f'{title} ;{author_str} ;{publisher} ;{published_date} ;{isbn};\n')
+                outfile.write(f'{title} |{author_str} |{publisher} |{published_date} |{isbn}|\n')
             else:
-                outfile.write(f'{title} ;{author_str} ;{publisher} ;{published_date}; ;\n')
+                outfile.write(f'{title} |{author_str} |{publisher} |{published_date} | |\n')
+
+
+def remove_dupes(filename = 'List.xlsx'):
+    df = pd.read_excel('List.xlsx')
+    df.drop_duplicates(subset=['Title'], inplace=True)
+    # df.to_excel(filename, index=False)
+    #remove rows with empty title
+    df = df[df['Title'].notna()]
+    df.to_excel(filename, index=False)
+
+
 
 def main():
     while True:
-        choice = input("(1) Read from File\n(2) Enter Author Name \n(3) Exit \nYour Choice: ")
+        choice = input("(1) Read from File\n(2) Enter Author Name \n(3) Remove Duplicates from List.xlsx \n(4) Exit \nYour Choice: ")
         if choice == '1':
             filename = input("Enter filename containing list of Authors: ")
             readfile(filename)
@@ -97,9 +111,15 @@ def main():
             author(author_name)
             convert_to_excel()
             print("Done! \nCheckout List.xlsx\n")
-        elif choice == '3':
+        elif choice == '4':
             print("Exiting...\n")
             break
+        elif choice == '3':
+            # filename = input("Enter filename containing duplicates:")
+            filename = 'List.xlsx'
+            # convert_to_excel()
+            remove_dupes(filename)
+            print("Done! \nRemoved duplicate titles from List.xlsx\n")
         else:
             print("Invalid Choice.\n")
 
